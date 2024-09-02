@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import * as fabric from 'fabric';
 import { v4 as uuidv4 } from 'uuid';
+import { SketchPicker } from 'react-color'; // Import the color picker component
 
 const FabricCanvas = () => {
   const canvasRef = useRef(null);
@@ -10,6 +11,7 @@ const FabricCanvas = () => {
   const [originY, setOriginY] = useState(0);
   const [activeMode, setActiveMode] = useState(null);
   const [layers, setLayers] = useState([]); // To track layers (objects) on the canvas
+  const [selectedColor, setSelectedColor] = useState('#000'); // State to hold the selected color
 
   useEffect(() => {
     if (!canvasRef.current) {
@@ -59,7 +61,7 @@ const FabricCanvas = () => {
       originY: 'top',
       width: 0,
       height: 0,
-      fill: 'transparent',
+      fill: selectedColor, // Use the selected color
       stroke: 'black',
       strokeWidth: 2,
       selectable: true,
@@ -135,29 +137,20 @@ const FabricCanvas = () => {
     }
   };
 
-  const handleBringForward = (id) => {
-    const selectedLayer = layers.find((layer) => layer.id === id);
-    if (selectedLayer) {
-      selectedLayer.object.bringForward();
-      canvasRef.current.renderAll();
-      setLayers([...layers]); // Update state to trigger re-render
-    }
-  };
-
-  const handleSendBackward = (id) => {
-    const selectedLayer = layers.find((layer) => layer.id === id);
-    if (selectedLayer) {
-      selectedLayer.object.sendBackwards();
-      canvasRef.current.renderAll();
-      setLayers([...layers]); // Update state to trigger re-render
-    }
-  };
-
   const handleDeleteLayer = (id) => {
     const selectedLayer = layers.find((layer) => layer.id === id);
     if (selectedLayer) {
       canvasRef.current.remove(selectedLayer.object);
       setLayers((prevLayers) => prevLayers.filter((layer) => layer.id !== id));
+      canvasRef.current.renderAll();
+    }
+  };
+
+  const handleColorChange = (color) => {
+    setSelectedColor(color.hex); // Update the selected color
+    const activeObject = canvasRef.current.getActiveObject();
+    if (activeObject) {
+      activeObject.set('fill', color.hex); // Change the color of the selected object
       canvasRef.current.renderAll();
     }
   };
@@ -169,6 +162,7 @@ const FabricCanvas = () => {
           {activeMode === 'rectangle' ? 'Rectangle Mode Active' : 'Draw Rectangle'}
         </button>
         <button onClick={deactivateModes}>Close</button>
+        <SketchPicker color={selectedColor} onChange={handleColorChange} />
         <canvas id="fabric-canvas" width={800} height={600} />
       </div>
       <div style={{ marginLeft: '20px', maxHeight: '600px', overflowY: 'auto' }}>
@@ -186,8 +180,6 @@ const FabricCanvas = () => {
               >
                 {layer.type} {index + 1}
               </span>
-              <button onClick={() => handleBringForward(layer.id)}>↑</button>
-              <button onClick={() => handleSendBackward(layer.id)}>↓</button>
               <button onClick={() => handleDeleteLayer(layer.id)}>🗑️</button>
             </li>
           ))}

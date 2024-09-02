@@ -1,4 +1,5 @@
 import FabricCanvas from "./components/FabricCanvas.jsx"
+import "./App.css"
 
 const App = () => {
   return (
