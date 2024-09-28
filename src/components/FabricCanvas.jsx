@@ -67,6 +67,7 @@ const FabricCanvas = () => {
       selectable: true,
       hasControls: true,
       id,
+      strokeUniform: true,
     });
 
     canvasRef.current.add(newRectangle);

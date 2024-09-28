@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "demo": "file:",
     "fabric": "^6.4.0",
     "fabricjs-react": "^2.0.0",
     "react": "^18.3.1",
