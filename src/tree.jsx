@@ -1,4 +1,4 @@
-import {useRef } from 'react';
+import {useEffect, useRef } from 'react';
 import * as fabric from 'fabric';
 
 class TreeNode {
@@ -123,18 +123,28 @@ const TreeVisualization = () => {
   const canvasRef = useRef(null);
   const treeRef = useRef(null);
 
-  // Initialize the canvas and tree instances
-  const canvas = new fabric.Canvas('canvasElementId');
-  const tree = new Tree(canvas);
-  canvasRef.current = canvas;
-  treeRef.current = tree;
+  const initializeTree = () => {
+    const canvas = new fabric.Canvas('canvasElementId');
+    const tree = new Tree(canvas);
+    canvasRef.current = canvas;
+    treeRef.current = tree;
 
-  // Set up the initial tree structure
-  tree.setRoot('root', { x: 100, y: 100, width: 80, height: 80, color: 'green', borderSize: 3 });
-  tree.addNode('root', 'child1', { x: 0, y: 0, width: 50, height: 50, color: 'red' });
-  tree.addNode('root', 'child2', { x: 0, y: 0, width: 50, height: 50, color: 'yellow' });
-  tree.addNode('child1', 'subChild1', { x: 0, y: 0, width: 40, height: 40, color: 'blue' });
-  tree.deleteNode('child1');
+    tree.setRoot('root', { x: 100, y: 100, width: 80, height: 80, color: 'green', borderSize: 3 });
+    tree.addNode('root', 'child1', { x: 0, y: 0, width: 50, height: 50, color: 'red' });
+    tree.addNode('root', 'child2', { x: 0, y: 0, width: 50, height: 50, color: 'yellow' });
+    tree.addNode('child1', 'subChild1', { x: 0, y: 0, width: 40, height: 40, color: 'blue' });
+    // tree.deleteNode('child1');
+  };
+
+  useEffect(() => {
+    initializeTree();
+
+    // Clean up the canvas when the component unmounts
+    return () => {
+      const canvas = canvasRef.current;
+      canvas.dispose();
+    };
+  }, []);
 
   const logTree = () => {
     const tree = treeRef.current;
